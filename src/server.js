@@ -12,6 +12,8 @@ import {
 } from "./errorHandlers.js";
 import dishesRouter from "./api/dishes/index.js";
 import usersRouter from "./api/users/index.js";
+import chequesRouter from "./api/cheques/index.js";
+import clientsRouter from "./api/clients/index.js";
 
 const server = express();
 const port = process.env.PORT || 3001;
@@ -33,6 +35,8 @@ server.use(express.json());
 
 server.use("/users", usersRouter);
 server.use("/dishes", dishesRouter);
+server.use("/cheques", chequesRouter);
+server.use("/clients", clientsRouter);
 
 server.use(badRequestHandler);
 server.use(unauthorizedHandler);

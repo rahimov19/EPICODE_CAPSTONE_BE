@@ -8,6 +8,7 @@ import q2m from "query-to-mongo";
 import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 import { createAccessToken } from "../../lib/auth/jwtTools.js";
 import PositionModel from "./positionModel.js";
+import TerminalModel from "./terminalModel.js";
 
 const cloudinaryUploader = multer({
   storage: new CloudinaryStorage({
@@ -39,6 +40,15 @@ usersRouter.post("/position", JWTAuthMiddleware, async (req, res, next) => {
     const newPosition = new PositionModel(req.body);
     await newPosition.save();
     res.status(201).send(newPosition);
+  } catch (error) {
+    next(error);
+  }
+});
+
+usersRouter.get("/position", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const positions = await PositionModel.find();
+    res.send(positions);
   } catch (error) {
     next(error);
   }
@@ -149,7 +159,7 @@ usersRouter.post("/login", async (req, res, next) => {
         terminalCode: user.terminalCode,
       };
       const accessToken = await createAccessToken(payload);
-      res.send({ accessToken });
+      res.send({ user, accessToken });
     } else {
       next(createHttpError(401, "Credentials are not OK!"));
     }
@@ -190,4 +200,34 @@ usersRouter.delete(":/userId", JWTAuthMiddleware, async (req, res, next) => {
   }
 });
 
+usersRouter.post("/terminal", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const terminal = new TerminalModel(req.body);
+    await terminal.save();
+    res.send(terminal);
+  } catch (error) {
+    next(error);
+  }
+});
+usersRouter.post("/terminal/login", async (req, res, next) => {
+  try {
+    const { name, terminalCode } = req.body;
+    const terminal = await TerminalModel.checkTerminalCredentials(
+      name,
+      terminalCode
+    );
+    if (terminal) {
+      const payload = {
+        _id: terminal._id,
+        terminalCode: terminal.terminalCode,
+      };
+      const accessToken = await createAccessToken(payload);
+      res.send({ terminal, accessToken });
+    } else {
+      next(createHttpError(401, "Credentials are not OK!"));
+    }
+  } catch (error) {
+    next(error);
+  }
+});
 export default usersRouter;

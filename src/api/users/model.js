@@ -2,20 +2,24 @@ import mongoose, { model } from "mongoose";
 import bcrypt from "bcrypt";
 
 const { Schema } = mongoose;
-const usersSchema = new Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true, uniqie: true },
-  password: { type: String, required: true },
-  avatar: { type: String },
-  terminalCode: {
-    type: Number,
-    required: true,
-    min: 1000,
-    max: 9999,
-    uniqie: true,
+const usersSchema = new Schema(
+  {
+    name: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    avatar: { type: String },
+    terminalCode: {
+      type: Number,
+      required: true,
+      min: 1000,
+      max: 9999,
+      unique: true,
+    },
+    position: { type: Schema.Types.ObjectId, ref: "Position" },
+    salary: { type: Number },
   },
-  position: { type: Schema.Types.ObjectId, ref: "Position" },
-});
+  { timestamps: true }
+);
 
 usersSchema.pre("save", async function (next) {
   const currentUser = this;
