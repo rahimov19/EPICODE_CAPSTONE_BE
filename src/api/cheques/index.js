@@ -12,7 +12,10 @@ chequesRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
     const cheques = await ChequesModel.find(
       mongoQuery.criteria,
       mongoQuery.options.fields
-    );
+    )
+      .populate({ path: "dishes", populate: { path: "dish" } })
+      .populate("createdBy")
+      .populate("deletedBy");
     res.send(cheques);
   } catch (error) {
     next(error);
@@ -30,7 +33,10 @@ chequesRouter.post("/", JWTAuthMiddleware, async (req, res, next) => {
 
 chequesRouter.get("/:chequeId", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const cheque = await ChequesModel.findById(req.params.chequeId);
+    const cheque = await ChequesModel.findById(req.params.chequeId)
+      .populate({ path: "dishes", populate: { path: "dish" } })
+      .populate("createdBy")
+      .populate("deletedBy");
     if (cheque) {
       res.send(cheque);
     } else {
@@ -47,7 +53,7 @@ chequesRouter.put("/:chequeId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const chequeToUpdate = await ChequesModel.findById(req.params.chequeId);
     if (chequeToUpdate) {
-      const updatedCheque = ChequesModel.findByIdAndUpdate(
+      const updatedCheque = await ChequesModel.findByIdAndUpdate(
         req.params.chequeId,
         req.body,
         { new: true, runValidators: true }
@@ -70,7 +76,7 @@ chequesRouter.delete(
     try {
       const chequeToDelete = await ChequesModel.findById(req.params.chequeId);
       if (chequeToDelete) {
-        const deletedCheque = ChequesModel.findByIdAndDelete(
+        const deletedCheque = await ChequesModel.findByIdAndDelete(
           req.params.chequeId
         );
         res.status(205).send();

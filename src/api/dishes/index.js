@@ -36,7 +36,7 @@ dishesRouter.get("/", JWTAuthMiddleware, async (req, res, next) => {
     const dishes = await DishModel.find(
       mongoQuery.criteria,
       mongoQuery.options.fields
-    );
+    ).populate("category");
     res.send(dishes);
   } catch (error) {
     next(error);
@@ -120,7 +120,9 @@ dishesRouter.get("/category", JWTAuthMiddleware, async (req, res, next) => {
 });
 dishesRouter.get("/:dishId", JWTAuthMiddleware, async (req, res, next) => {
   try {
-    const dish = await DishModel.findById(req.params.dishId);
+    const dish = await DishModel.findById(req.params.dishId).populate(
+      "category"
+    );
     if (dish) {
       res.send(dish);
     } else {
@@ -134,7 +136,7 @@ dishesRouter.put("/:dishId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const dishToUpdate = await DishModel.findById(req.params.dishId);
     if (dishToUpdate) {
-      const updatedDish = DishModel.findByIdAndUpdate(
+      const updatedDish = await DishModel.findByIdAndUpdate(
         req.params.dishId,
         req.body,
         { new: true, runValidators: true }
@@ -151,7 +153,7 @@ dishesRouter.delete("/:dishId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const dishToDelete = await DishModel.findById(req.params.dishId);
     if (dishToDelete) {
-      const deletedDish = DishModel.findByIdAndDelete(req.params.dishId);
+      const deletedDish = await DishModel.findByIdAndDelete(req.params.dishId);
       res.status(205).send();
     } else {
       createHttpError(404, `Dish with id ${req.params.dishId} is not Found`);

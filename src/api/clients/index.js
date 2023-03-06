@@ -47,7 +47,7 @@ clientsRouter.put("/:clientId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const clientToUpdate = await ClientModel.findById(req.params.clientId);
     if (clientToUpdate) {
-      const updatedClient = ClientModel.findByIdAndUpdate(
+      const updatedClient = await ClientModel.findByIdAndUpdate(
         req.params.clientId,
         req.body,
         { new: true, runValidators: true }
@@ -70,7 +70,7 @@ clientsRouter.delete(
     try {
       const clientToDelete = await ClientModel.findById(req.params.clientId);
       if (clientToDelete) {
-        const deletedClient = ClientModel.findByIdAndDelete(
+        const deletedClient = await ClientModel.findByIdAndDelete(
           req.params.clientId
         );
         res.status(205).send();
