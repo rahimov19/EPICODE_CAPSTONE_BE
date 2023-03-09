@@ -149,6 +149,55 @@ dishesRouter.put("/:dishId", JWTAuthMiddleware, async (req, res, next) => {
     next(error);
   }
 });
+
+dishesRouter.put(
+  "/category/:catId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const catToUpdate = await CategoryModel.findById(req.params.catId);
+      if (catToUpdate) {
+        const updatedCat = await CategoryModel.findByIdAndUpdate(
+          req.params.catId,
+          req.body,
+          { new: true, runValidators: true }
+        );
+        res.status(204).send(updatedCat);
+      } else {
+        createHttpError(
+          404,
+          `Category with id ${req.params.catId} is not Found`
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+dishesRouter.delete(
+  "/category/:catId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const catToDelete = await CategoryModel.findById(req.params.catId);
+      if (catToDelete) {
+        const deletedDish = await CategoryModel.findByIdAndDelete(
+          req.params.catId
+        );
+        res.status(205).send();
+      } else {
+        createHttpError(
+          404,
+          `Category with id ${req.params.catId} is not Found`
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 dishesRouter.delete("/:dishId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const dishToDelete = await DishModel.findById(req.params.dishId);
