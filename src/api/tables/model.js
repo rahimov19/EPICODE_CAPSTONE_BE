@@ -4,7 +4,7 @@ const { Schema, model } = mongoose;
 
 const tablesSchema = new Schema(
   {
-    name: { type: String },
+    schema: [],
   },
   { timestamps: true }
 );

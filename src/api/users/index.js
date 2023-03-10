@@ -186,7 +186,7 @@ usersRouter.put("/:userId", JWTAuthMiddleware, async (req, res, next) => {
   }
 });
 
-usersRouter.delete(":/userId", JWTAuthMiddleware, async (req, res, next) => {
+usersRouter.delete("/:userId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const userToDelete = await UsersModel.findById(req.params.userId);
     if (userToDelete) {
@@ -230,4 +230,55 @@ usersRouter.post("/terminal/login", async (req, res, next) => {
     next(error);
   }
 });
+
+usersRouter.put(
+  "/position/:positionId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const positionToChange = await PositionModel.findById(
+        req.params.positionId
+      );
+      if (positionToChange) {
+        const updatedPosition = await PositionModel.findByIdAndUpdate(
+          req.params.positionId,
+          req.body,
+          { new: true, runValidators: true }
+        );
+        res.status(204).send(updatedPosition);
+      } else {
+        createHttpError(
+          404,
+          `Position with id ${req.params.positionId} is not found`
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+usersRouter.delete(
+  "/position/:positionId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const positionToDelete = await PositionModel.findById(
+        req.params.positionId
+      );
+      if (positionToDelete) {
+        await PositionModel.findByIdAndDelete(req.params.positionId);
+        res.status(205).send();
+      } else {
+        createHttpError(
+          404,
+          `Position with id ${req.params.positionId} is not found`
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
 export default usersRouter;
