@@ -9,6 +9,7 @@ import { JWTAuthMiddleware } from "../../lib/auth/jwtAuth.js";
 import { createAccessToken } from "../../lib/auth/jwtTools.js";
 import PositionModel from "./positionModel.js";
 import TerminalModel from "./terminalModel.js";
+import bcrypt from "bcrypt";
 
 const cloudinaryUploader = multer({
   storage: new CloudinaryStorage({
@@ -99,6 +100,10 @@ usersRouter.put("/me", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const user = await UsersModel.findById(req.user._id);
     if (user) {
+      if (req.body.password) {
+        const plainPassword = req.body.password;
+        req.body.password = await bcrypt.hash(plainPassword, 10);
+      }
       const updatedUser = await UsersModel.findByIdAndUpdate(
         req.user._id,
         req.body,
@@ -136,6 +141,18 @@ usersRouter.post(
   }
 );
 
+usersRouter.get("/terminal", JWTAuthMiddleware, async (req, res, next) => {
+  try {
+    const terminal = await TerminalModel.find();
+
+    res.status(200).send(terminal);
+  } catch (error) {
+    next(error);
+  }
+});
+
+export default usersRouter;
+
 usersRouter.get("/:userId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const user = await UsersModel.findById(req.params.userId);
@@ -172,6 +189,10 @@ usersRouter.put("/:userId", JWTAuthMiddleware, async (req, res, next) => {
   try {
     const userToChange = await UsersModel.findById(req.params.userId);
     if (userToChange) {
+      if (req.body.password) {
+        const plainPassword = req.body.password;
+        req.body.password = await bcrypt.hash(plainPassword, 10);
+      }
       const updatedUser = await UsersModel.findByIdAndUpdate(
         req.params.userId,
         req.body,
@@ -281,4 +302,44 @@ usersRouter.delete(
   }
 );
 
-export default usersRouter;
+usersRouter.put(
+  "/terminal/:terminalId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const terminal = await TerminalModel.findById(req.params.terminalId);
+      if (terminal) {
+        const updatedTerminal = await TerminalModel.findByIdAndUpdate(
+          req.params.terminalId,
+          req.body,
+          { new: true, runValidators: true }
+        );
+        res.status(204).send(updatedTerminal);
+      } else {
+        next(createHttpError(404, `Terminal with the provided id not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);
+
+usersRouter.delete(
+  "/terminal/:terminalId",
+  JWTAuthMiddleware,
+  async (req, res, next) => {
+    try {
+      const terminal = await TerminalModel.findById(req.params.terminalId);
+      if (terminal) {
+        const deletedTerminal = await TerminalModel.findByIdAndDelete(
+          req.params.terminalId
+        );
+        res.status(205).send();
+      } else {
+        next(createHttpError(404, `Terminal with the provided id not found`));
+      }
+    } catch (error) {
+      next(error);
+    }
+  }
+);

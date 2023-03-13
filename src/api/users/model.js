@@ -31,25 +31,6 @@ usersSchema.pre("save", async function (next) {
   next();
 });
 
-// usersSchema.pre(
-//   "updateOne",
-//   { document: true, query: false },
-//   async function (next) {
-//     const password = this.getUpdate().$set.password;
-//     if (!password) {
-//       return next();
-//     }
-//     try {
-//       const plainPassword = password;
-
-//       this.getUpdate().$set.password = await bcrypt.hash(plainPassword, 10);
-//       next();
-//     } catch (error) {
-//       return next(error);
-//     }
-//   }
-// );
-
 usersSchema.methods.toJSON = function () {
   const usersMongoDoc = this;
   const user = usersMongoDoc.toObject();
