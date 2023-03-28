@@ -2,7 +2,7 @@
   "name": "epicode_capstone_be",
   "description": "BackEnd part of Final Capstone Project",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
