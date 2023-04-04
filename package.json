@@ -34,7 +34,8 @@
     "multer-storage-cloudinary": "^4.0.0",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
-    "query-to-mongo": "^0.10.2"
+    "query-to-mongo": "^0.10.2",
+    "query-to-sequelize": "^0.1.1"
   },
   "devDependencies": {
     "dotenv": "^16.0.3",
